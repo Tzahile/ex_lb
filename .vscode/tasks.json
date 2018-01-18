@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build ex3",
+            "type": "shell",
+            "command": "gcc -g",
+            "args": [
+                "*.c",
+                "-o",
+                "ex_lb"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
