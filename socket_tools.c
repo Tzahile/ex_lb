@@ -41,7 +41,7 @@ int SendMessage(int socket, char *message){
 }
 
 int RecieveMessage(int socket, char *reply, int buffer){
-  return recv(socket , (char *)reply , buffer , 0);
+  return recv(socket , reply , buffer , 0);
 }
 
 int GetRandomPort() {
