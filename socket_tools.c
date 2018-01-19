@@ -36,6 +36,14 @@ int AcceptConnection(int socket, struct sockaddr_in connection) {
   return accept(socket, (struct sockaddr *)&connection, (socklen_t *)&addr_len);
 }
 
+int SendMessage(int socket, char *message){
+  return send(socket, message, strlen(message), 0);
+}
+
+int RecieveMessage(int socket, char *reply, int buffer){
+  return recv(socket , (char *)reply , buffer , 0);
+}
+
 int GetRandomPort() {
   return rand() % (UPPER_PORTS_RANGE - LOWER_PORTS_RANGE) + LOWER_PORTS_RANGE;
 }
