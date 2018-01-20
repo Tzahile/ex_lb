@@ -13,8 +13,13 @@
 #define MESSAGE_TERMINATION "\r\n\r\n"
 #define RECIEVE_BUFFER_SIZE 1024
 
+int BindToPort(int socket, const char *ip);
+int ListenToConnections(int socket, int number_of_connections);
+int MakeSocket();
+int SendMessage(int socket, char *message);
 int GetRandomPort();
-char *FirstNeedleInHaystack_ByOccurrence(char *haystack, int haystack_size, char *needle, int needle_size);
+char *NeedleInHaystack_ByOccurrence(char *haystack, int haystack_size, char *needle, int needle_size,
+                                    int required_occurrence);
 void WriteIntToFile(FILE *target, char *path, int int_content);
 
 int MakeSocket() { return socket(AF_INET, SOCK_STREAM, 0); }
@@ -42,38 +47,37 @@ int AcceptConnection(int socket, struct sockaddr_in connection)
   return accept(socket, (struct sockaddr *)&connection, (socklen_t *)&addr_len);
 }
 
-int SendMessage(int socket, char *message) { return send(socket, message, strlen(message), 0); }
+int SendMessage(int socket, char *message) { return send(socket, message, sizeof(message), 0); }
 
 char *RecieveMessage(int socket, bool isClient)
 {
-  char *message = NULL, first_message_termination;
+  char *message = NULL, *message_last_termination = NULL;
   message = (char *)calloc(RECIEVE_BUFFER_SIZE, sizeof(char));
   int total_read_size = 0, new_read_size = 0;
   while ((new_read_size = recv(socket, message + total_read_size, RECIEVE_BUFFER_SIZE, 0)) > 0) {
     message = (char *)realloc(message, total_read_size + new_read_size);
     total_read_size += new_read_size;
     if (isClient) {
-      /*if (FirstNeedleInHaystack_ByOccurrence(message, total_read_size, MESSAGE_TERMINATION, strlen(MESSAGE_TERMINATION,1)) != NULL) {
+      message_last_termination =
+          NeedleInHaystack_ByOccurrence(message, total_read_size, MESSAGE_TERMINATION, strlen(MESSAGE_TERMINATION), 1);
+      if (message_last_termination != NULL) {
         break;
-      } else {
-        first_message_termination =
-            FirstNeedleInHaystack_ByOccurrence(message, total_read_size, MESSAGE_TERMINATION, strlen(MESSAGE_TERMINATION),1);
-        if (FirstNeedleInHaystack_ByOccurrence(message + strlen(MESSAGE_TERMINATION), total_read_size, MESSAGE_TERMINATION,
-                                  strlen(MESSAGE_TERMINATION)) != NULL) {
-          break;
-        }
       }
-
-    */} else {
-        message = (char *)realloc(message, RECIEVE_BUFFER_SIZE + sizeof(message));
+    } else {
+      message_last_termination =
+          NeedleInHaystack_ByOccurrence(message, total_read_size, MESSAGE_TERMINATION, strlen(MESSAGE_TERMINATION), 2);
+      if (message_last_termination != NULL) {
+        break;
       }
+    }
+    message = (char *)realloc(message, RECIEVE_BUFFER_SIZE + sizeof(message));
   }
   return message;
 }
 
 int GetRandomPort() { return rand() % (UPPER_PORTS_RANGE - LOWER_PORTS_RANGE) + LOWER_PORTS_RANGE; }
 
-int makeSocket_Bind_Listen(int *socket, FILE *port_documentation_file, char *path, int number_of_connections)
+void makeSocket_Bind_Listen(int *socket, FILE *port_documentation_file, char *path, int number_of_connections)
 {
   int port_number = 0;
   struct sockaddr_in communication_side;

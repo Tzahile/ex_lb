@@ -8,7 +8,7 @@
             "args": [
                 "*.c",
                 "-o",
-                "ex_lb"
+                "ex3_lb"
             ],
             "group": {
                 "kind": "build",

@@ -34,11 +34,11 @@ int main()
   client_side_accepted_socket = AcceptConnection(client_side_socket, client_side);
 
   server_socket_index = 0;
-  while (strcmp(client_message, "EXIT PROGRAM\r\n\r\n")) {
+  while (true) {
     client_message = RecieveMessage(client_side_accepted_socket, true);
-    send(server_side_accepted_socket[server_socket_index], client_message, total_read_size, 0);
-    server_socket_index++;
-    total_read_size = 0;
+    send(server_side_accepted_socket[server_socket_index], client_message, sizeof(client_message), 0);
     server_message = RecieveMessage(server_side_accepted_socket[server_socket_index], false);
+    send(client_side_accepted_socket, server_message, sizeof(server_message), 0);
+    server_socket_index++;
   }
 }
