@@ -3,25 +3,27 @@ from socket import *
 
 RECIEVE_BUFFER_SIZE = 1024
 PATH = 'localhost'
+
 server_port_file = open("server_port", "r")
+server_port = int(server_port_file.read())
+server_port_file.close()
+
 message_termination = "\r\n\r\n"
 requested_url = "/counter"
 counter = 0
 
 server = socket()
-server_port = int(server_port_file.read())
 server.connect((PATH, server_port))
 while True:
     whole_message = ''    
     end_of_message = False
-    while !end_of_message:
+    while not end_of_message:
         whole_message += server.recv(RECIEVE_BUFFER_SIZE)
         if len(whole_message) >= len(message_termination):
             if whole_message[-len(message_termination):] == message_termination:
                 end_of_message = True
-    counter++
+    counter += 1
     first_line = whole_message.split("\r\n")[0]
     if first_line.split(" ")[1] == requested_url:
-        reply = "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nContent-Length: {0}\r\n\r\n{1}\r\n\r\n"
-            .format(len(str(counter)), counter)
+        reply = "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nContent-Length: {0}\r\n\r\n{1}\r\n\r\n".format(len(str(counter)), counter)
         server.send(reply)

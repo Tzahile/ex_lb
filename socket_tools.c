@@ -4,8 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+mode_t umask(mode_t mask);
 
 #define LOCALHOST "127.0.0.1"
 #define UPPER_PORTS_RANGE 64000
@@ -14,9 +17,7 @@
 #define RECIEVE_BUFFER_SIZE 1024
 
 int BindToPort(int socket, const char *ip);
-int ListenToConnections(int socket, int number_of_connections);
 int MakeSocket();
-int SendMessage(int socket, char *message);
 int GetRandomPort();
 char *NeedleInHaystack_ByOccurrence(char *haystack, int haystack_size, char *needle, int needle_size,
                                     int required_occurrence);
@@ -47,9 +48,9 @@ int AcceptConnection(int socket, struct sockaddr_in connection)
   return accept(socket, (struct sockaddr *)&connection, (socklen_t *)&addr_len);
 }
 
-int SendMessage(int socket, char *message) { return send(socket, message, sizeof(message), 0); }
+int SendMessage(int socket, char *message, int message_length) { return send(socket, message, message_length, 0); }
 
-char *RecieveMessage(int socket, bool isClient)
+char *RecieveMessage(int socket, int *buffer_final_size, bool isClient)
 {
   char *message = NULL, *message_last_termination = NULL;
   message = (char *)calloc(RECIEVE_BUFFER_SIZE, sizeof(char));
@@ -72,23 +73,31 @@ char *RecieveMessage(int socket, bool isClient)
     }
     message = (char *)realloc(message, RECIEVE_BUFFER_SIZE + sizeof(message));
   }
+  *buffer_final_size = total_read_size;
   return message;
 }
+void FreeRecievedMessage(char *message) { free(message); }
 
 int GetRandomPort() { return rand() % (UPPER_PORTS_RANGE - LOWER_PORTS_RANGE) + LOWER_PORTS_RANGE; }
 
-void makeSocket_Bind_Listen(int *socket, FILE *port_documentation_file, char *path, int number_of_connections)
+void MakeSocketAndBind(int *socket, FILE *port_documentation_file, char *path, int number_of_connections)
 {
   int port_number = 0;
   struct sockaddr_in communication_side;
   *socket = MakeSocket();
   port_number = BindToPort(*socket, LOCALHOST);
   WriteIntToFile(port_documentation_file, path, port_number);
-  ListenToConnections(*socket, number_of_connections);
+}
+
+int CloseSocket(int socket)
+{
+  shutdown(socket, SHUT_RDWR);
+  return close(socket);
 }
 
 void WriteIntToFile(FILE *target, char *path, int int_content)
 {
+  umask(0002);
   target = fopen(path, "w");
   fprintf(target, "%d", int_content);
   fclose(target);
