@@ -8,9 +8,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-mode_t umask(mode_t mask);
 
-#define LOCALHOST "127.0.0.1"
 #define UPPER_PORTS_RANGE 64000
 #define LOWER_PORTS_RANGE 1024
 #define MESSAGE_TERMINATION "\r\n\r\n"
@@ -19,9 +17,9 @@ mode_t umask(mode_t mask);
 int BindToPort(int socket, const char *ip);
 int MakeSocket();
 int GetRandomPort();
-char *NeedleInHaystack_ByOccurrence(char *haystack, int haystack_size, char *needle, int needle_size,
+char *NeedleInHaystack_ByOccurrence(char *haystack, int haystack_size, char const *needle, int needle_size,
                                     int required_occurrence);
-void WriteIntToFile(FILE *target, char *path, int int_content);
+void WriteIntToFile(FILE *target_file, char *path, int int_content);
 
 int MakeSocket() { return socket(AF_INET, SOCK_STREAM, 0); }
 
@@ -32,10 +30,11 @@ int BindToPort(int socket, const char *ip)
 
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = inet_addr(ip);
-  server.sin_port = htons(port_number);
+  server.sin_port = htons(80);
 
   while (bind(socket, (struct sockaddr *)&server, sizeof(server)) < 0) {
     port_number = GetRandomPort();
+    server.sin_port = htons(port_number);
   }
   return port_number;
 }
@@ -76,16 +75,16 @@ char *RecieveMessage(int socket, int *buffer_final_size, bool isClient)
   *buffer_final_size = total_read_size;
   return message;
 }
+
 void FreeRecievedMessage(char *message) { free(message); }
 
 int GetRandomPort() { return rand() % (UPPER_PORTS_RANGE - LOWER_PORTS_RANGE) + LOWER_PORTS_RANGE; }
 
-void MakeSocketAndBind(int *socket, FILE *port_documentation_file, char *path, int number_of_connections)
+void MakeSocketAndBind(int *socket, FILE *port_documentation_file, char *path, const char *ip)
 {
   int port_number = 0;
-  struct sockaddr_in communication_side;
   *socket = MakeSocket();
-  port_number = BindToPort(*socket, LOCALHOST);
+  port_number = BindToPort(*socket, ip);
   WriteIntToFile(port_documentation_file, path, port_number);
 }
 
@@ -95,19 +94,17 @@ int CloseSocket(int socket)
   return close(socket);
 }
 
-void WriteIntToFile(FILE *target, char *path, int int_content)
+void WriteIntToFile(FILE *target_file, char *path, int int_content)
 {
-  umask(0002);
-  target = fopen(path, "w");
-  fprintf(target, "%d", int_content);
-  fclose(target);
+  target_file = fopen(path, "w");
+  fprintf(target_file, "%d", int_content);
+  fclose(target_file);
 }
-char *NeedleInHaystack_ByOccurrence(char *haystack, int haystack_size, char *needle, int needle_size,
+char *NeedleInHaystack_ByOccurrence(char *haystack, int haystack_size, const char *needle, int needle_size,
                                     int required_occurrence)
 {
   int i = 0, j = 0;
   int match_occurrence = 0;
-  bool match = false;
   if (haystack_size >= needle_size) {
     for (i = 0; i < haystack_size; i++) {
       for (j = 0; j < needle_size; j++) {

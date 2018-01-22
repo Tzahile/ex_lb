@@ -3,13 +3,13 @@ from socket import *
 import random
 import time
 
-port = int(sys.argv[1])
+port = int(sys.argv[1]) `cat http_port`
 
 request = \
 """GET /counter HTTP/1.1\r
 Host: nova.cs.tau.ac.il\r
 Connection: keep-alive\r
-Cache-Control: max-age=0\r
+Cache-Control: max-age=0\r/
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r
 User-Agent: Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.57 Safari/537.36\r
 Accept-Encoding: gzip,deflate,sdch\r

@@ -1,27 +1,35 @@
 #!/usr/bin/python2.7 -tt
+
+def IsEndOfMessage(message, message_termination):
+    if len(message) >= len(message_termination):
+        if message[-len(message_termination):] == message_termination:
+            return True
+    return False
+
+def RecieveMessage(buffer_size):
+    whole_message = ''
+    end_of_message = False
+    while not end_of_message:
+        whole_message += server.recv(buffer_size)
+        end_of_message = IsEndOfMessage(whole_message, message_termination)
+    return whole_message
+
 from socket import *
 
 RECIEVE_BUFFER_SIZE = 1024
-PATH = 'localhost'
+IP = 'localhost'
+message_termination = "\r\n\r\n"
+requested_url = "/counter"
 
 server_port_file = open("server_port", "r")
 server_port = int(server_port_file.read())
 server_port_file.close()
-
-message_termination = "\r\n\r\n"
-requested_url = "/counter"
 counter = 0
 
 server = socket()
-server.connect((PATH, server_port))
+server.connect((IP, server_port))
 while True:
-    whole_message = ''    
-    end_of_message = False
-    while not end_of_message:
-        whole_message += server.recv(RECIEVE_BUFFER_SIZE)
-        if len(whole_message) >= len(message_termination):
-            if whole_message[-len(message_termination):] == message_termination:
-                end_of_message = True
+    whole_message = RecieveMessage(RECIEVE_BUFFER_SIZE)
     counter += 1
     first_line = whole_message.split("\r\n")[0]
     if first_line.split(" ")[1] == requested_url:
