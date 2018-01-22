@@ -23,7 +23,7 @@ int main()
   FILE *http_port_file = NULL;
   srand(time(NULL));
   MakeSocketAndBind(&server_side_socket, server_port_file, SERVER_PORT_FILE_PATH, LOCALHOST);
-  MakeSocketAndBind(&client_side_socket, http_port_file, HTTP_PORT_FILE_PATH, NOVA_IP);
+  MakeSocketAndBind(&client_side_socket, http_port_file, HTTP_PORT_FILE_PATH, LOCALHOST);
   ListenToConnections(server_side_socket, NUMBER_OF_SERVERS);
   for (server_socket_index = 0; server_socket_index < 1; server_socket_index++) {
     server_side_accepted_socket[server_socket_index] = AcceptConnection(server_side_socket, server_side);

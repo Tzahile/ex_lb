@@ -7,6 +7,8 @@
             "command": "gcc -g",
             "args": [
                 "*.c",
+                "-Wextra",
+                "-Wall",
                 "-o",
                 "ex3_lb"
             ],

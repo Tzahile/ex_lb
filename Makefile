@@ -1,22 +1,29 @@
 COMPILE = gcc -c
-OFILES = main.o socket_tools.o
+OFILES = ex3_lb.o socket_tools.o
 TEST_PATH = ~nimrodav/socket_ex/
 TEST_NAME = test.sh
+GRANT_PERMISSION = chmod 755
+NIMROD_TEST="$(shell $(TEST_PATH)$(TEST_NAME))"
 
-all : $(OFILES)
+ex3_lb: ex3_lb.o socket_tools.o
+	@gcc $(OFILES) -o ex3_lb
+
+all : ex3_lb $(OFILES)
 .PHONY : all
 
 clean :
-	rm $(OFILES)
+	@rm $(OFILES)
 .PHONY : clean
 
 test:
-	$(TEST_PATH)$(TEST_NAME)
+	@echo $(NIMROD_TEST)
 .PHONY : test
 
-main.o : socket_tools.h
-	$(COMPILE) main.c
+ex3_lb.o : socket_tools.h
+	@$(COMPILE) ex3_lb.c
+	@$(GRANT_PERMISSION) ex3_lb.o
 
 socket_tools.o : socket_tools.h
-	$(COMPILE) socket_tools.c
+	@$(COMPILE) socket_tools.c
+	@$(GRANT_PERMISSION) socket_tools.o
 

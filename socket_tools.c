@@ -30,7 +30,7 @@ int BindToPort(int socket, const char *ip)
 
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = inet_addr(ip);
-  server.sin_port = htons(80);
+  server.sin_port = htons(port_number);
 
   while (bind(socket, (struct sockaddr *)&server, sizeof(server)) < 0) {
     port_number = GetRandomPort();

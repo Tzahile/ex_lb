@@ -5,10 +5,39 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "run_test.py",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "args": [
+                "`cat http_port`"
+            ],
+            "cwd": "",
+            "console": "externalTerminal",
+            "env": {},
+            "envFile": "${workspaceFolder}/run_test.py",
+            "debugOptions": []
+        },
+        {
+            "name": "ex3_server",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "cwd": "",
+            "console": "externalTerminal",
+            "env": {},
+            "envFile": "${workspaceFolder}/ex3_server",
+            "debugOptions": []
+        },
+        {
+            "name": "main.c",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/ex_lb",
+            "program": "${workspaceFolder}/ex3_lb",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
